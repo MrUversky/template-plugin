@@ -1,5 +1,6 @@
 package ru.evotor.webbasedapplication
 
+import org.apache.commons.io.IOUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.yaml.snakeyaml.Yaml
@@ -10,6 +11,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.util.zip.ZipFile
 
 /**
  * Created by nixan on 28.04.17.
@@ -17,7 +19,7 @@ import java.nio.file.StandardCopyOption
 
 private const val ANDROID_PLUGIN_NAME = "com.android.application"
 
-private const val TEMPLATE_URL = "https://market.evotor.ru/static/webapptemplate/2_0_0/"
+private const val TEMPLATE_URL = "https://market.evotor.ru/static/webapptemplate/2_0_0/template.zip"
 
 class WebApplicationPlugin : Plugin<Project> {
 
@@ -39,37 +41,34 @@ class WebApplicationPlugin : Plugin<Project> {
     private fun validateTemplateLayout(path: File) {
         if (!path.exists()) {
             println("Path ${path.canonicalPath} doesn't exist, creating...")
-            createTemplateFolder(folderPath = path)
-        } else {
-            println("Path ${path.canonicalPath} exists...")
+            path.mkdirs()
         }
 
-        val manifestFile = File(path, yamlFileName)
-        if (!manifestFile.exists()) {
-            println("Downloading manifest example...")
-            createTemplateManifest(manifestPath = manifestFile)
+        if (path.list().isEmpty()) {
+            downloadTemplate(path)
         }
-
-        validateTemplateManifest(manifestPath = manifestFile)
     }
 
-    private fun createTemplateFolder(folderPath: File) {
-        folderPath.mkdirs()
-    }
-
-    private fun createTemplateManifest(manifestPath: File) {
-        downloadToFile("$TEMPLATE_URL${manifestPath.name}", manifestPath)
-    }
-
-    private fun validateTemplateManifest(manifestPath: File) {
-        val manifestYaml = Yaml().load(FileInputStream(manifestPath)).let {
-            if (it is Map<*, *>) {
-                it as Map<String, *>
+    private fun downloadTemplate(path: File) {
+        val zipFile = File(path, "template.zip")
+        downloadToFile(TEMPLATE_URL, zipFile)
+        val archiveFile = ZipFile(zipFile)
+        archiveFile.entries().toList().forEach { entry ->
+            val destination = File(path, entry.name)
+            if (destination.isDirectory) {
+                destination.mkdirs()
             } else {
-                throw IllegalArgumentException("Corrupt manifest file: ${manifestPath.name}")
+                destination.parentFile.mkdirs()
+                archiveFile.getInputStream(entry).use { inputStream ->
+                    val out = FileOutputStream(destination)
+                    IOUtils.copy(inputStream, out)
+                    IOUtils.closeQuietly(inputStream)
+                    out.close()
+                }
             }
         }
-        manifestYaml[""]
+        archiveFile.close()
+        zipFile.delete()
     }
 
     private fun downloadToFile(url: String, file: File) {

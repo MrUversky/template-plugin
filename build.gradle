@@ -26,6 +26,9 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
+    // Zip
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
     // YAML parsing
     compile 'org.yaml:snakeyaml:1.17'
 
