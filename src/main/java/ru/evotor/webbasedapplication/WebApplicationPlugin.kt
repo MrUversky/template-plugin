@@ -12,6 +12,14 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipFile
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+import java.io.IOException
+import java.io.File
+import java.util.zip.ZipInputStream
+
 
 /**
  * Created by nixan on 28.04.17.
@@ -56,25 +64,33 @@ class WebApplicationPlugin : Plugin<Project> {
     private fun downloadTemplate(path: File) {
         val zipFile = File(path, "template.zip")
         downloadToFile(TEMPLATE_URL, zipFile)
-        val archiveFile = ZipFile(zipFile)
-        archiveFile.entries().toList().forEach { entry ->
-            if (entry.isDirectory) {
-                File(path, entry.name).mkdirs()
-            } else {
-                val outputFile = File(path, entry.name)
-                if (!outputFile.parentFile.exists()) {
-                    outputFile.parentFile.mkdirs()
-                }
-
-                val input = BufferedInputStream(archiveFile.getInputStream(entry))
-                val output = BufferedOutputStream(FileOutputStream(outputFile))
-                IOUtils.copy(input, output)
-                output.close()
-                input.close()
-            }
-        }
-        archiveFile.close()
+        unzip(zipFile, path)
         zipFile.delete()
+    }
+
+    private fun unzip(zipFile: File, outputPath: File) {
+        // buffer for read and write data to file
+        val buffer = ByteArray(1024)
+        var len: Int
+        val zis = ZipInputStream(FileInputStream(zipFile))
+        var ze: ZipEntry? = zis.nextEntry
+        while (ze != null) {
+            val fileName = ze.name
+            val newFile = File(outputPath.toString() + File.separator + fileName)
+            println("Unzipping to " + newFile.absolutePath)
+            // create directories for sub directories in zip
+            File(newFile.parent).mkdirs()
+            val fos = FileOutputStream(newFile)
+            IOUtils.copy(zis, fos)
+            fos.close()
+            zis.closeEntry()
+            ze = zis.nextEntry
+        }
+        // close last ZipEntry
+        zis.closeEntry()
+        zis.close()
+
+        println("Done!!!")
     }
 
     private fun downloadToFile(url: String, file: File) {
