@@ -29,7 +29,7 @@ class WebApplicationPlugin : Plugin<Project> {
             throw IllegalStateException("You should also apply '$ANDROID_PLUGIN_NAME' plugin")
         }
 
-        val path = File(File(project.path), sourcesDirectoryPath)
+        val path = File(project.projectDir, sourcesDirectoryPath)
 
         println("Validating template...")
         validateTemplateLayout(path)
