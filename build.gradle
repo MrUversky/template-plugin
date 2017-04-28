@@ -27,7 +27,7 @@ dependencies {
     compile localGroovy()
 
     // Zip
-    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile 'org.rauschig:jarchivelib:0.7.1'
 
     // YAML parsing
     compile 'org.yaml:snakeyaml:1.17'
