@@ -21,7 +21,7 @@ private const val TEMPLATE_URL = "https://market.evotor.ru/static/webapptemplate
 
 class WebApplicationPlugin : Plugin<Project> {
 
-    val sourcesDirectoryPath = File("src/main/assets/")
+    val sourcesDirectoryPath = "src/main/assets/"
     val yamlFileName = "client.yaml"
 
     override fun apply(project: Project) {
@@ -29,8 +29,10 @@ class WebApplicationPlugin : Plugin<Project> {
             throw IllegalStateException("You should also apply '$ANDROID_PLUGIN_NAME' plugin")
         }
 
+        val path = File(File(project.path), sourcesDirectoryPath)
+
         println("Validating template...")
-        validateTemplateLayout(sourcesDirectoryPath)
+        validateTemplateLayout(path)
 
     }
 
