@@ -38,6 +38,8 @@ class WebApplicationPlugin : Plugin<Project> {
         if (!path.exists()) {
             println("Path ${path.canonicalPath} doesn't exist, creating...")
             createTemplateFolder(folderPath = path)
+        } else {
+            println("Path ${path.canonicalPath} exists...")
         }
 
         val manifestFile = File(path, yamlFileName)
