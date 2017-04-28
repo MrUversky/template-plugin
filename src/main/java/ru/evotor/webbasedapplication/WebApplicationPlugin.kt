@@ -44,6 +44,10 @@ class WebApplicationPlugin : Plugin<Project> {
             path.mkdirs()
         }
 
+        if (path.list().size == 1 && path.list().contains("template.zip")) {
+            File(path, "template.zip").delete()
+        }
+
         if (path.list().isEmpty()) {
             downloadTemplate(path)
         }
@@ -54,17 +58,19 @@ class WebApplicationPlugin : Plugin<Project> {
         downloadToFile(TEMPLATE_URL, zipFile)
         val archiveFile = ZipFile(zipFile)
         archiveFile.entries().toList().forEach { entry ->
-            val destination = File(path, entry.name)
-            if (destination.isDirectory) {
-                destination.mkdirs()
+            if (entry.isDirectory) {
+                File(path, entry.name).mkdirs()
             } else {
-                destination.parentFile.mkdirs()
-                archiveFile.getInputStream(entry).use { inputStream ->
-                    val out = FileOutputStream(destination)
-                    IOUtils.copy(inputStream, out)
-                    IOUtils.closeQuietly(inputStream)
-                    out.close()
+                val outputFile = File(path, entry.name)
+                if (!outputFile.parentFile.exists()) {
+                    outputFile.parentFile.mkdirs()
                 }
+
+                val input = BufferedInputStream(archiveFile.getInputStream(entry))
+                val output = BufferedOutputStream(FileOutputStream(outputFile))
+                IOUtils.copy(input, output)
+                output.close()
+                input.close()
             }
         }
         archiveFile.close()
