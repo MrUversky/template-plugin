@@ -68,6 +68,11 @@ class WebApplicationPlugin implements Plugin<Project> {
                         universalApk false
                     }
                 }
+
+                lintOptions {
+                    abortOnError false
+                }
+
             }
 
             repositories {
@@ -200,8 +205,9 @@ class GenerateManifest extends DefaultTask {
         if (shouldInterrupt)
             return
         //Adding meta-data to app
+        def packageName = manifestXML.attributes().get("package")
         NodeList apps = manifestXML.application
-        String[] packageDir = yamlObject.packageName.toString().split("\\.")
+        String[] packageDir = packageName.toString().split("\\.")
         StringBuilder packageFilesPath = new StringBuilder()
         packageDir.each { part -> packageFilesPath.append(part).append("/") }
         def daemonServiceFilePath = outputDir.toString() + "/java/" + packageFilesPath.toString() + "DaemonServiceImplementation.java"
@@ -213,17 +219,21 @@ class GenerateManifest extends DefaultTask {
                     if (metaData.attribute(nameSpace.name) == "app_uuid")
                         appNode.remove(metaData)
                 }
+                ((Node) appNode).attributes().remove(nameSpace.label)
+                ((Node) appNode).attributes().put("xmlns:tools", "http://schemas.android.com/tools")
+                ((Node) appNode).attributes().put(nameSpace.label, "@string/generated_app_name")
+                ((Node) appNode).attributes().put("tools:replace", "android:label")
 
                 if (!new File(daemonServiceFilePath).exists() && !new File(uiPluginFilePath).exists()) {
                     StringBuilder stringBuilder = new StringBuilder()
-                    stringBuilder.append("package " + yamlObject.packageName + ";\n")
+                    stringBuilder.append("package " + packageName + ";\n")
                             .append("import ru.evotor.webtemplatelibriary.UiPluginService; \n")
                             .append("public class UIPluginServiceImplementation extends UiPluginService {}")
 
                     GFileUtils.writeFile(stringBuilder.toString(), new File(uiPluginFilePath))
 
                     stringBuilder = new StringBuilder()
-                    stringBuilder.append("package " + yamlObject.packageName + ";\n")
+                    stringBuilder.append("package " + packageName + ";\n")
                             .append("import ru.evotor.webtemplatelibriary.DaemonService; \n")
                             .append("public class DaemonServiceImplementation extends DaemonService {}")
 
@@ -249,7 +259,7 @@ class GenerateManifest extends DefaultTask {
                             })
                             def className = view.name.toString().toUpperCase()
                             StringBuilder stringBuilder = new StringBuilder()
-                            stringBuilder.append("package " + yamlObject.packageName + ";\n")
+                            stringBuilder.append("package " + packageName + ";\n")
                                     .append("import ru.evotor.webtemplatelibriary.LauncherActivity;\n")
                                     .append("public class ").append(className).append(" extends LauncherActivity {}")
 
@@ -494,5 +504,24 @@ class GenerateManifest extends DefaultTask {
         originalManifest.delete()
         GFileUtils.copyFile(new File(outputDir.toString() + '/AndroidManifest_Generated.xml'),
                 new File(outputDir.toString() + '/AndroidManifest.xml'))
+
+        //Generate resources
+        def stringResourcesWriter = new StringWriter()
+        def stringResourcesMarkupBuilder = new MarkupBuilder(stringResourcesWriter)
+        stringResourcesMarkupBuilder.resources {
+            "string"(appUUID, "name": "app_uuid")
+            "string"(appName, "name": "generated_app_name")
+        }
+        GFileUtils.writeFile(stringResourcesWriter.toString(), new File(outputDir.toString() + "/res/values/strings_generated.xml"))
+        new File(outputDir.toString() + "/res/values/strings.xml").delete()
+
+        getProject().with {
+            android {
+                defaultConfig {
+                    versionCode versionYaml
+                    versionName versionNameYaml
+                }
+            }
+        }
     }
 }
