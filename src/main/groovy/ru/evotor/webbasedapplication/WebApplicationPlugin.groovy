@@ -208,7 +208,6 @@ class GenerateManifest extends DefaultTask {
             }
             new Node(manifestXML, "application", new HashMap() {
                 {
-                    put("xmlns:android", "http://schemas.android.com/apk/res/android")
                     put("android:icon", "@mipmap/ic_launcher")
                     put("android:allowBackup", "true")
                     put("android:theme", "@style/AppTheme")
