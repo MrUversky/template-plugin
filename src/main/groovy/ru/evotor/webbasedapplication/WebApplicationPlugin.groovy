@@ -197,13 +197,22 @@ class GenerateManifest extends DefaultTask {
         def nameSpace = new Namespace("http://schemas.android.com/apk/res/android", "android")
         def manifestXML = new XmlParser().parseText(manifestFile.text)
 
-        def shouldInterrupt = false
+        def shouldRebuild = false
         manifestXML.application."meta-data".each { metaData ->
             if (metaData.attribute(nameSpace.name) == "app_uuid")
-                shouldInterrupt = true
+                shouldRebuild = true
         }
-        if (shouldInterrupt)
-            return
+        if (shouldRebuild) {
+            manifestXML.children().clear()
+            new Node(manifestXML, "application", new HashMap() {
+                {
+                    put("xmlns:android", "http://schemas.android.com/apk/res/android")
+                    put("android:icon", "@mipmap/ic_launcher")
+                    put("android:allowBackup", "true")
+                    put("android:theme", "@style/AppTheme")
+                }
+            })
+        }
         //Adding meta-data to app
         def packageName = manifestXML.attributes().get("package")
         NodeList apps = manifestXML.application
