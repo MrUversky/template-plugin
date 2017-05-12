@@ -203,7 +203,9 @@ class GenerateManifest extends DefaultTask {
                 shouldRebuild = true
         }
         if (shouldRebuild) {
-            removeAllChildren(manifestXML)
+            manifestXML.application.each { applicationNode ->
+                manifestXML.remove(applicationNode)
+            }
             new Node(manifestXML, "application", new HashMap() {
                 {
                     put("xmlns:android", "http://schemas.android.com/apk/res/android")
@@ -532,10 +534,5 @@ class GenerateManifest extends DefaultTask {
                 }
             }
         }
-    }
-
-    public void removeAllChildren(Node node)
-    {
-        for (Node child; (child = node.getFirstChild()) != null; node.removeChild(child));
     }
 }
