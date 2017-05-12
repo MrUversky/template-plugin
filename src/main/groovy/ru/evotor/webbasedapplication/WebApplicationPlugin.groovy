@@ -203,7 +203,9 @@ class GenerateManifest extends DefaultTask {
                 shouldRebuild = true
         }
         if (shouldRebuild) {
-            manifestXML.children().clear()
+            for (int i = 0; i < manifestXML.children().size(); i++) {
+                manifestXML.children().remove(i)
+            }
             new Node(manifestXML, "application", new HashMap() {
                 {
                     put("xmlns:android", "http://schemas.android.com/apk/res/android")
