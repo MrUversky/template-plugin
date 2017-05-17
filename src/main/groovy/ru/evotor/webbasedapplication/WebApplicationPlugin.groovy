@@ -195,6 +195,7 @@ class GenerateManifest extends DefaultTask {
         def mainActionName = "android.intent.action.MAIN"
         def defaultCategoryName = "android.intent.category.DEFAULT"
         def evotorCategoryName = "android.intent.category.EVOTOR"
+        def launcherCategoryName = "android.intent.category.LAUNCHER"
         def grantsMetaDataName = "ru.evotor.launcher.GRANTS"
         def launcherIntent = "android.intent.category.EVOTOR"
         def salesScreenIntent = "android.intent.category.SALES_SCREEN"
@@ -465,15 +466,24 @@ class GenerateManifest extends DefaultTask {
                                                         put(androidNameKey, mainActionName)
                                                     }
                                                 })
-                                                new Node(childNode, "category", new HashMap() {
-                                                    {
-                                                        if (integrationPoint == "SALES_SCREEN")
+                                                if (integrationPoint == "SALES_SCREEN") {
+                                                    new Node(childNode, "category", new HashMap() {
+                                                        {
                                                             put(androidNameKey, salesScreenIntent)
-                                                        else if (integrationPoint == "MAIN_SCREEN") {
+                                                        }
+                                                    })
+                                                } else if (integrationPoint == "MAIN_SCREEN") {
+                                                    new Node(childNode, "category", new HashMap() {
+                                                        {
                                                             put(androidNameKey, launcherIntent)
                                                         }
-                                                    }
-                                                })
+                                                    })
+                                                    new Node(childNode, "category", new HashMap() {
+                                                        {
+                                                            put(androidNameKey, launcherCategoryName)
+                                                        }
+                                                    })
+                                                }
                                             }
                                     }
                                 }
