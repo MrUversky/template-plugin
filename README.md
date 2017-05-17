@@ -11,7 +11,7 @@ allprojects {
     }
   }
   dependencies {
-          compile 'com.github.evotor:template-plugin:v1.0.1'
+          compile 'com.github.evotor:template-plugin:v1.0.+'
   }
 ```
 
