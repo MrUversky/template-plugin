@@ -13,15 +13,16 @@ allprojects {
   dependencies {
           compile 'com.github.evotor:template-plugin:v1.0.1'
   }
-  ```
+```
 
 В зависимости `buildscript`'а добавьте:
 
 ```
 classpath group: 'com.github.evotor', name: 'template-plugin', version: 'v1.0.+'
-                ```
+```
 
 В файле `build.gradle` приложения укажите:
+
 ```
 apply plugin: 'ru.evotor.webbasedapplication'
 ```
