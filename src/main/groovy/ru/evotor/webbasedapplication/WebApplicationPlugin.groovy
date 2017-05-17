@@ -87,21 +87,28 @@ class WebApplicationPlugin implements Plugin<Project> {
             dependencies {
                 compile(name: 'template', ext: 'aar')
 
+                // Evotor native development library
                 compile 'com.github.evotor:integration-library:v0.0.7'
+
                 // RxJava and RxAndroid
                 compile 'io.reactivex:rxandroid:1.2.0'
                 compile 'io.reactivex:rxjava:1.1.5'
                 compile 'com.google.dagger:dagger:2.0.2'
                 provided 'org.glassfish:javax.annotation:10.0-b28'
+
                 //Android JSCore
                 compile 'com.github.ericwlange:AndroidJSCore:3.0.1'
+
                 // YAML parsing
                 compile 'org.yaml:snakeyaml:1.17'
+
                 // OkHttp and logging interceptor
                 compile 'com.squareup.okhttp3:okhttp:3.6.0'
                 compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+
                 // Retrofit
                 compile 'com.squareup.retrofit2:retrofit:2.2.0'
+
                 // Jackson and Retrofit converter and adapter
                 compile 'com.squareup.retrofit2:adapter-rxjava:2.2.0'
                 compile 'com.squareup.retrofit2:converter-jackson:2.2.0'
