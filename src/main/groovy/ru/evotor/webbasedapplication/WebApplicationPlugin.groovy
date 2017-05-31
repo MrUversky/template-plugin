@@ -87,9 +87,7 @@ class WebApplicationPlugin implements Plugin<Project> {
             dependencies {
                 compile(name: 'template', ext: 'aar')
 
-                // Evotor native development library
-                compile 'com.github.evotor:integration-library:v0.0.7'
-
+                compile 'com.github.evotor:integration-library:v0.3.1'
                 // RxJava and RxAndroid
                 compile 'io.reactivex:rxandroid:1.2.0'
                 compile 'io.reactivex:rxjava:1.1.5'
@@ -222,6 +220,25 @@ class GenerateManifest extends DefaultTask {
                 }
             })
         }
+
+        //Adding permissions to app
+        yamlObject.capabilities.each {
+            capability ->
+                if (capability == "barcode-scanner") {
+                    new Node(manifestXML, "uses-permission", new HashMap() {
+                        {
+                            put(nameSpace.name, "ru.evotor.devices.SCANNER_RECEIVER");
+                        }
+                    })
+                } else if (capability == "internet") {
+                    new Node(manifestXML, "uses-permission", new HashMap() {
+                        {
+                            put(nameSpace.name, "android.permission.INTERNET");
+                        }
+                    })
+                }
+        }
+
         //Adding meta-data to app
         def packageName = manifestXML.attributes().get("package")
         NodeList apps = manifestXML.application
@@ -337,7 +354,7 @@ class GenerateManifest extends DefaultTask {
         NodeList services = manifestXML.application.service
         services.each {
             service ->
-                if (service.attributes().get(nameSpace.name).equals(".UiPluginService")) {
+                if (service.attributes().get(nameSpace.name).equals(".UIPluginServiceImplementation")) {
                     yamlObject.plugins.each {
                         plugin ->
                             plugin.moments.each {
@@ -372,7 +389,7 @@ class GenerateManifest extends DefaultTask {
                                 })
                             }
                     }
-                } else if (service.attributes().get(nameSpace.name).equals(".DaemonService")) {
+                } else if (service.attributes().get(nameSpace.name).equals(".DaemonServiceImplementation")) {
                     yamlObject.daemons.each { daemon ->
                         daemon.events.each { event ->
                             if (service.children().action.findAll {
