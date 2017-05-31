@@ -93,15 +93,20 @@ class WebApplicationPlugin implements Plugin<Project> {
                 compile 'io.reactivex:rxjava:1.1.5'
                 compile 'com.google.dagger:dagger:2.0.2'
                 provided 'org.glassfish:javax.annotation:10.0-b28'
+
                 //Android JSCore
                 compile 'com.github.ericwlange:AndroidJSCore:3.0.1'
+
                 // YAML parsing
                 compile 'org.yaml:snakeyaml:1.17'
+
                 // OkHttp and logging interceptor
                 compile 'com.squareup.okhttp3:okhttp:3.6.0'
                 compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+
                 // Retrofit
                 compile 'com.squareup.retrofit2:retrofit:2.2.0'
+
                 // Jackson and Retrofit converter and adapter
                 compile 'com.squareup.retrofit2:adapter-rxjava:2.2.0'
                 compile 'com.squareup.retrofit2:converter-jackson:2.2.0'
@@ -188,6 +193,7 @@ class GenerateManifest extends DefaultTask {
         def mainActionName = "android.intent.action.MAIN"
         def defaultCategoryName = "android.intent.category.DEFAULT"
         def evotorCategoryName = "android.intent.category.EVOTOR"
+        def launcherCategoryName = "android.intent.category.LAUNCHER"
         def grantsMetaDataName = "ru.evotor.launcher.GRANTS"
         def launcherIntent = "android.intent.category.EVOTOR"
         def salesScreenIntent = "android.intent.category.SALES_SCREEN"
@@ -477,15 +483,24 @@ class GenerateManifest extends DefaultTask {
                                                         put(androidNameKey, mainActionName)
                                                     }
                                                 })
-                                                new Node(childNode, "category", new HashMap() {
-                                                    {
-                                                        if (integrationPoint == "SALES_SCREEN")
+                                                if (integrationPoint == "SALES_SCREEN") {
+                                                    new Node(childNode, "category", new HashMap() {
+                                                        {
                                                             put(androidNameKey, salesScreenIntent)
-                                                        else if (integrationPoint == "MAIN_SCREEN") {
+                                                        }
+                                                    })
+                                                } else if (integrationPoint == "MAIN_SCREEN") {
+                                                    new Node(childNode, "category", new HashMap() {
+                                                        {
                                                             put(androidNameKey, launcherIntent)
                                                         }
-                                                    }
-                                                })
+                                                    })
+                                                    new Node(childNode, "category", new HashMap() {
+                                                        {
+                                                            put(androidNameKey, launcherCategoryName)
+                                                        }
+                                                    })
+                                                }
                                             }
                                     }
                                 }
