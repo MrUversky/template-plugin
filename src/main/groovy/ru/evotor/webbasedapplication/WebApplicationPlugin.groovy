@@ -80,7 +80,7 @@ class WebApplicationPlugin implements Plugin<Project> {
             dependencies {
                 compile(name: 'template', ext: 'aar')
 
-                compile 'com.github.evotor:integration-library:v0.3.1'
+                compile 'com.github.evotor:integration-library:v0.3.7'
                 // RxJava and RxAndroid
                 compile 'io.reactivex:rxandroid:1.2.0'
                 compile 'io.reactivex:rxjava:1.1.5'
