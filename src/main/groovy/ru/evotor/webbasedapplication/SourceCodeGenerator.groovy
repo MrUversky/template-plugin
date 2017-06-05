@@ -86,4 +86,25 @@ class SourceCodeGenerator {
         GFileUtils.copyFile(new File(assetsFolder + icon256Path),
                 new File(outputDir.toString() + "/res/mipmap-xxxhdpi/" + view.name + "_icon.png"))
     }
+
+    public void generateServiceForView(Object view) {
+        def className = view.name.toString().toUpperCase()
+        def filePath = outputDir + "/java/" + packageSourceFilesPath + className + "_SERVICE.java"
+        if (!new File(filePath).exists()) {
+            StringBuilder stringBuilder = new StringBuilder()
+            stringBuilder.append("package " + packageName + ";\n")
+                    .append("import android.app.IntentService; \n")
+                    .append("import android.content.Intent; \n")
+                    .append("import android.os.IBinder; \n")
+                    .append("import android.support.annotation.Nullable; \n")
+                    .append("public class " + className + "_SERVICE extends IntentService {\n")
+                    .append("public " + className + "_SERVICE() { super(\"" + className + "\");} \n")
+                    .append("@Override\n").append("public IBinder onBind(Intent intent) { \n")
+                    .append("startActivity(new Intent(getApplicationContext(), ").append(view.name.toString().toUpperCase())
+                    .append(".class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); \n return null; \n } \n")
+                    .append("@Override\n").append("protected void onHandleIntent(@Nullable Intent intent) {} }")
+
+            GFileUtils.writeFile(stringBuilder.toString(), new File(filePath))
+        }
+    }
 }

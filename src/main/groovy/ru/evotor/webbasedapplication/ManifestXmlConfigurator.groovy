@@ -74,6 +74,28 @@ class ManifestXmlConfigurator {
         })
     }
 
+    private void generateServiceForActivity(Object view, String iconName, String colorName) {
+        manifestXml.application.each {
+            applicationNode ->
+                Node service = new Node(applicationNode, "service", new HashMap() {
+                    {
+                        put(Constants.namespace.name, "." + view.name.toString().toUpperCase() + "_SERVICE")
+                        put(Constants.namespace.enabled, "true")
+                        put(Constants.namespace.exported, "true")
+                        put(Constants.namespace.label, view.label)
+                        put(Constants.namespace.icon, iconName)
+                    }
+                })
+                new Node(service, "meta-data", new HashMap() {
+                    {
+                        put(Constants.namespace.name, Constants.BACKGROUND_COLOR_SALES_SCREEN)
+                        put("android:value", "@color/" + colorName)
+                    }
+                })
+        }
+        sourceCodeGenerator.generateServiceForView(view)
+    }
+
     private void addActivities() {
         def viewName = null
         clientYaml.views.each {
@@ -84,9 +106,9 @@ class ManifestXmlConfigurator {
                 def integrationPoint = view.point
                 def stringWriter = new StringWriter()
                 def markupBuilder = new MarkupBuilder(stringWriter)
-                def launcherColorName = view.name + "_launcher_color"
+                def colorName = view.name + "_launcher_color"
                 markupBuilder.resources {
-                    "color"("name": launcherColorName, view.color)
+                    "color"("name": colorName, view.color)
                 }
                 Node activity
                 manifestXml.application.each { applicationNode ->
@@ -108,11 +130,13 @@ class ManifestXmlConfigurator {
 
                 new Node(activity, "meta-data", new HashMap() {
                     {
-                        if (integrationPoint == Constants.INTEGRATION_POINT_SALES_SCREEN)
-                            put(Constants.namespace.name, backgroundColorMetaSales)
-                        else if (integrationPoint == Constants.INTEGRATION_POINT_MAIN_SCREEN)
-                            put(Constants.namespace.name, backgroundColorMetaLauncher)
-                        put("android:value", "@color/" + launcherColorName)
+                        put("android:value", "@color/" + colorName)
+                        if (integrationPoint == Constants.INTEGRATION_POINT_SALES_SCREEN) {
+                            generateServiceForActivity(view, "@mipmap/" + viewName + "_icon", colorName)
+                            put(Constants.namespace.name, Constants.BACKGROUND_COLOR_SALES_SCREEN)
+                        } else if (integrationPoint == Constants.INTEGRATION_POINT_MAIN_SCREEN) {
+                            put(Constants.namespace.name, Constants.BACKGROUND_COLOR_MAIN_SCREEN)
+                        }
                     }
                 })
 
@@ -157,6 +181,10 @@ class ManifestXmlConfigurator {
     }
 
     private void addCapabilities() {
+        manifestXml."uses-permission".each {
+            permissionNode ->
+                manifestXml.remove(permissionNode)
+        }
         clientYaml.capabilities.each {
             capability ->
                 if (capability == "barcode-scanner") {
