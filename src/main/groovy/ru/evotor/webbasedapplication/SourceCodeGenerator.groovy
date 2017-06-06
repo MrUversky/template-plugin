@@ -87,23 +87,26 @@ class SourceCodeGenerator {
                 new File(outputDir.toString() + "/res/mipmap-xxxhdpi/" + view.name + "_icon.png"))
     }
 
-    public void generateServiceForView(Object view) {
+    public void generateServiceForViewSalesScreen(Object view) {
         def className = view.name.toString().toUpperCase()
         def filePath = outputDir + "/java/" + packageSourceFilesPath + className + "_SERVICE.java"
         if (!new File(filePath).exists()) {
             StringBuilder stringBuilder = new StringBuilder()
             stringBuilder.append("package " + packageName + ";\n")
-                    .append("import android.app.IntentService; \n")
-                    .append("import android.content.Intent; \n")
-                    .append("import android.os.IBinder; \n")
-                    .append("import android.support.annotation.Nullable; \n")
-                    .append("public class " + className + "_SERVICE extends IntentService {\n")
-                    .append("public " + className + "_SERVICE() { super(\"" + className + "\");} \n")
-                    .append("@Override\n").append("public IBinder onBind(Intent intent) { \n")
-                    .append("startActivity(new Intent(getApplicationContext(), ").append(view.name.toString().toUpperCase())
-                    .append(".class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); \n return null; \n } \n")
-                    .append("@Override\n").append("protected void onHandleIntent(@Nullable Intent intent) {} }")
-
+                    .append("import android.content.Intent;; \n")
+                    .append("import android.os.Bundle; \n")
+                    .append("import android.os.RemoteException; \n")
+                    .append("import java.util.HashMap; \n")
+                    .append("import java.util.Map; \n")
+                    .append("import ru.evotor.framework.core.IntegrationService; \n")
+                    .append("import ru.evotor.framework.core.action.processor.ActionProcessor; \n")
+                    .append("public class " + className + "_SERVICE extends IntegrationService {\n")
+                    .append("protected Map<String, ActionProcessor> createProcessors() { \n")
+                    .append("Map<String, ActionProcessor> processorsMap = new HashMap<>(); \n")
+                    .append("processorsMap.put(\"evo.v2.receipt.sell.receiptDiscount\", new ActionProcessor() {\n")
+                    .append("@Override \n").append("public void process(String s, Bundle bundle, Callback callback) {\n")
+                    .append("try {\ncallback.startActivity(new Intent(getApplicationContext(), " + view.name.toString().toUpperCase() + ".class));\n}\n")
+                    .append("catch (RemoteException e) {\ne.printStackTrace();\n}\n").append("}\n});\n return processorsMap;\n}\n}\n")
             GFileUtils.writeFile(stringBuilder.toString(), new File(filePath))
         }
     }

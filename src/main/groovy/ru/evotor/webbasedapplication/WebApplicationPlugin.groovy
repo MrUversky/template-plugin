@@ -80,7 +80,7 @@ class WebApplicationPlugin implements Plugin<Project> {
             dependencies {
                 compile(name: 'template', ext: 'aar')
 
-                compile 'com.github.evotor:integration-library:v0.3.7'
+                compile 'com.github.evotor:integration-library:v0.3.8'
                 // RxJava and RxAndroid
                 compile 'io.reactivex:rxandroid:1.2.0'
                 compile 'io.reactivex:rxjava:1.1.5'
@@ -145,7 +145,7 @@ class WebApplicationPlugin implements Plugin<Project> {
     }
 
     void downloadTemplateAar(File path) {
-        def aarFile = new File(path, "template.aar")
+        def aarFile = new File(path, TEMPLATE_AAR)
         downloadToFile(TEMPLATE_AAR_URL, aarFile)
     }
 
