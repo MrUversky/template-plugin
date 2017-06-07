@@ -18,7 +18,6 @@ class ManifestXmlConfigurator {
 
     public void processConfiguration() {
         setCorrectApplicationUUID()
-        recreateApplicationNode()
         addCapabilities()
         addUIPluginAndDaemonServices()
         addActivities()
@@ -30,6 +29,7 @@ class ManifestXmlConfigurator {
         packageName = manifestXml.attributes().get("package")
         sourceCodeGenerator = new SourceCodeGenerator(packageName, currentProject.projectDir.absolutePath + "/src/main")
         removeApplicationUUIDNode()
+        recreateApplicationNode()
         addApplicationUUIDNode()
     }
 
@@ -74,7 +74,7 @@ class ManifestXmlConfigurator {
         })
     }
 
-    private void generateServiceForActivity(Object view, String iconName, String colorName) {
+    private void generateServiceForActivitySalesScreen(Object view, String iconName, String colorName) {
         manifestXml.application.each {
             applicationNode ->
                 Node service = new Node(applicationNode, "service", new HashMap() {
@@ -86,6 +86,22 @@ class ManifestXmlConfigurator {
                         put(Constants.namespace.icon, iconName)
                     }
                 })
+                Node intentFilterNode = new Node(service, "intent-filter")
+                new Node(intentFilterNode, "action", new HashMap() {
+                    {
+                        put(Constants.namespace.name, Constants.ANDROID_ACTION_MAIN)
+                    }
+                })
+                new Node(intentFilterNode, "action", new HashMap() {
+                    {
+                        put(Constants.namespace.name, Constants.ANDROID_CATEGORY_SALES_SCREEN)
+                    }
+                })
+                new Node(intentFilterNode, "category", new HashMap() {
+                    {
+                        put(Constants.namespace.name, Constants.ANDROID_CATEGORY_DEFAULT)
+                    }
+                })
                 new Node(service, "meta-data", new HashMap() {
                     {
                         put(Constants.namespace.name, Constants.BACKGROUND_COLOR_SALES_SCREEN)
@@ -93,7 +109,7 @@ class ManifestXmlConfigurator {
                     }
                 })
         }
-        sourceCodeGenerator.generateServiceForView(view)
+        sourceCodeGenerator.generateServiceForViewSalesScreen(view)
     }
 
     private void addActivities() {
@@ -132,7 +148,7 @@ class ManifestXmlConfigurator {
                     {
                         put("android:value", "@color/" + colorName)
                         if (integrationPoint == Constants.INTEGRATION_POINT_SALES_SCREEN) {
-                            generateServiceForActivity(view, "@mipmap/" + viewName + "_icon", colorName)
+                            generateServiceForActivitySalesScreen(view, "@mipmap/" + viewName + "_icon", colorName)
                             put(Constants.namespace.name, Constants.BACKGROUND_COLOR_SALES_SCREEN)
                         } else if (integrationPoint == Constants.INTEGRATION_POINT_MAIN_SCREEN) {
                             put(Constants.namespace.name, Constants.BACKGROUND_COLOR_MAIN_SCREEN)
