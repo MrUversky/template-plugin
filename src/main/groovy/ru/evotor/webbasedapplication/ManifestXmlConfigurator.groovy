@@ -18,7 +18,6 @@ class ManifestXmlConfigurator {
 
     public void processConfiguration() {
         setCorrectApplicationUUID()
-        recreateApplicationNode()
         addCapabilities()
         addUIPluginAndDaemonServices()
         addActivities()
@@ -30,6 +29,7 @@ class ManifestXmlConfigurator {
         packageName = manifestXml.attributes().get("package")
         sourceCodeGenerator = new SourceCodeGenerator(packageName, currentProject.projectDir.absolutePath + "/src/main")
         removeApplicationUUIDNode()
+        recreateApplicationNode()
         addApplicationUUIDNode()
     }
 
