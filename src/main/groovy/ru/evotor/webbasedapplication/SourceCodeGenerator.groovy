@@ -57,6 +57,23 @@ class SourceCodeGenerator {
         }
     }
 
+    public void generateDaemonBroadcastReceiver() {
+        StringBuilder stringBuilder = new StringBuilder()
+        stringBuilder.append("package " + packageName + ";\n")
+                .append("import android.content.BroadcastReceiver;\n")
+                .append("import android.content.Context;\n")
+                .append("import android.content.Intent;\n")
+                .append("import android.util.Log;\n")
+                .append("public class DaemonReceiver extends BroadcastReceiver {\n")
+                .append("@Override\n")
+                .append("public void onReceive(Context context, Intent intent) {\n")
+                .append("Log.d(\"!!!!\", \"Received \" + intent.getAction());\n")
+                .append("context.startService(new Intent(intent.getAction()).setPackage(context.getPackageName()));\n")
+                .append("}\n}\n")
+        GFileUtils.writeFile(stringBuilder.toString(), new File(outputDir
+                + "/java/" + packageSourceFilesPath + "DaemonReceiver.java"))
+    }
+
     public void generateStringResources(String appUUID, String appName) {
         def stringResourcesWriter = new StringWriter()
         def stringResourcesMarkupBuilder = new MarkupBuilder(stringResourcesWriter)
