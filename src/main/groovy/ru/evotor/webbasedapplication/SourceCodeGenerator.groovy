@@ -68,7 +68,7 @@ class SourceCodeGenerator {
                 .append("@Override\n")
                 .append("public void onReceive(Context context, Intent intent) {\n")
                 .append("Log.d(\"!!!!\", \"Received \" + intent.getAction());\n")
-                .append("context.startService(new Intent(intent.getAction()).setPackage(context.getPackageName()));\n")
+                .append("context.startService(new Intent(intent.getAction()).setPackage(context.getPackageName()).putExtras(intent.getExtras()));\n")
                 .append("}\n}\n")
         GFileUtils.writeFile(stringBuilder.toString(), new File(outputDir
                 + "/java/" + packageSourceFilesPath + "DaemonReceiver.java"))
