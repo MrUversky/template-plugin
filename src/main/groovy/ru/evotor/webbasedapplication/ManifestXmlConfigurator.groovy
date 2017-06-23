@@ -336,22 +336,26 @@ class ManifestXmlConfigurator {
         sourceCodeGenerator.generateDaemonBroadcastReceiver()
         Node daemonBroadcastReceiverNode = null
         manifestXml.application.each {
-            daemonBroadcastReceiverNode = new Node(it, "receiver", new HashMap() {
-                {
-                    put(Constants.namespace.name, ".DaemonReceiver")
-                    put(Constants.namespace.enabled, "true")
-                    put(Constants.namespace.exported, "true")
-                }
-            })
-        }
-        Node intentFilterNode = new Node(daemonBroadcastReceiverNode, "intent-filter")
-        clientYaml.daemons.each { daemon ->
-            daemon.events.each {
-                new Node(intentFilterNode, "action", new HashMap() {
+            if (clientYaml.daemons != null) {
+                daemonBroadcastReceiverNode = new Node(it, "receiver", new HashMap() {
                     {
-                        put(Constants.namespace.name, it)
+                        put(Constants.namespace.name, ".DaemonReceiver")
+                        put(Constants.namespace.enabled, "true")
+                        put(Constants.namespace.exported, "true")
                     }
                 })
+            }
+        }
+        if (clientYaml.daemons != null) {
+            Node intentFilterNode = new Node(daemonBroadcastReceiverNode, "intent-filter")
+            clientYaml.daemons.each { daemon ->
+                daemon.events.each {
+                    new Node(intentFilterNode, "action", new HashMap() {
+                        {
+                            put(Constants.namespace.name, it)
+                        }
+                    })
+                }
             }
         }
         return daemonBroadcastReceiverNode
