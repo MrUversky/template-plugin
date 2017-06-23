@@ -1,6 +1,6 @@
 group='com.github.evotor'
 
-version 'v1.1.6'
+version 'v1.1.7'
 
 
 buildscript {
@@ -52,7 +52,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.github.evotor'
             artifactId "template-plugin"
-            version "v1.1.6"
+            version "v1.1.7"
             artifact "$buildDir/libs/${project.getName()}-${version}.jar"
 
             pom.withXml {
